@@ -11,10 +11,11 @@ import (
 )
 
 type LocketConn struct {
-	conn    net.Conn
+	conn       net.Conn
+	Identifier string
 }
 
-func NewLocketConn(conn net.Conn, logDir string) (*LocketConn, error) {
+func NewLocketConn(conn net.Conn, logDir string, identifier string) (*LocketConn, error) {
 	path := path.Join(logDir, "locket.log")
 	logFile, logFileErr := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if logFileErr != nil {
@@ -23,19 +24,19 @@ func NewLocketConn(conn net.Conn, logDir string) (*LocketConn, error) {
 
 	golog.SetOutput(logFile)
 
-	return &LocketConn{conn: conn}, nil
+	return &LocketConn{conn: conn, Identifier: identifier}, nil
 }
 
 func (locket LocketConn) Read(b []byte) (int, error) {
 	bytesRead, readErr := locket.conn.Read(b)
 	if readErr != nil {
-		golog.Errorf("Read(b []byte): Error: %s", readErr)
+		golog.Errorf("%s : Read(b []byte): Error: %s", locket.Identifier, readErr)
 		return bytesRead, readErr
 	}
 
 	bString := trimString(string(b[:]), bytesRead)
 	bHex := trimString(hex.EncodeToString(b), bytesRead * 2)
-	golog.Infof("Read(b []byte): \"%s\" - %d - %s", bString, bytesRead, bHex)
+	golog.Infof("%s : Read(b []byte): \"%s\" - %d - %s", locket.Identifier, bString, bytesRead, bHex)
 	
 	return bytesRead, readErr
 }
@@ -43,14 +44,14 @@ func (locket LocketConn) Read(b []byte) (int, error) {
 func (locket LocketConn) Write(b []byte) (int, error) {
 	bytesWritten, writeErr := locket.conn.Write(b)
 	if writeErr != nil {
-		golog.Errorf("Write(b []byte): Error: %s", writeErr)
+		golog.Errorf("%s : Write(b []byte): Error: %s", locket.Identifier, writeErr)
 		return bytesWritten, writeErr
 	}
 
 	bString := trimString(string(b[:]), bytesWritten)
 	bHex := trimString(hex.EncodeToString(b), bytesWritten * 2)
 	
-	golog.Infof("Write(b []byte): \"%s\" - %d - %s", bString, bytesWritten, bHex)
+	golog.Infof("%s : Write(b []byte): \"%s\" - %d - %s", locket.Identifier, bString, bytesWritten, bHex)
 
 	return bytesWritten, writeErr
 }
@@ -58,10 +59,10 @@ func (locket LocketConn) Write(b []byte) (int, error) {
 func (locket LocketConn) Close() error {
 	closeError := locket.conn.Close()
 	if closeError != nil {
-		golog.Errorf("Close(): Error: %s", closeError)
+		golog.Errorf("%s : Close(): Error: %s", locket.Identifier, closeError)
 	}
 
-	golog.Info("Close() called successfully")
+	golog.Infof("%s : Close() called successfully", locket.Identifier)
 
 	return closeError
 }

@@ -27,7 +27,7 @@ func acceptConnections(listener net.Listener) {
 			return
 		}
 
-		locketConn, locketErr := NewLocketConn(serverConn, "/Users/bluesaxorcist/Desktop")
+		locketConn, locketErr := NewLocketConn(serverConn, "/Users/bluesaxorcist/Desktop", "testServer")
 		if locketErr != nil {
 			fmt.Println(locketErr)
 			return
@@ -61,7 +61,7 @@ func TestLocket(t *testing.T) {
 		return
 	}
 
-	locketConn, locketErr := NewLocketConn(conn, "/Users/bluesaxorcist/Desktop")
+	locketConn, locketErr := NewLocketConn(conn, "/Users/bluesaxorcist/Desktop", "testClient")
 	if locketErr != nil {
 		fmt.Println(locketErr)
 		t.Fail()
