@@ -33,8 +33,8 @@ func (locket LocketConn) Read(b []byte) (int, error) {
 		return bytesRead, readErr
 	}
 
-	bString := string(b[:])
-	bHex := hex.EncodeToString(b)
+	bString := trimString(string(b[:]), bytesRead)
+	bHex := trimString(hex.EncodeToString(b), bytesRead * 2)
 	golog.Infof("Read(b []byte): \"%s\" - %d - %s", bString, bytesRead, bHex)
 	
 	return bytesRead, readErr
@@ -47,8 +47,9 @@ func (locket LocketConn) Write(b []byte) (int, error) {
 		return bytesWritten, writeErr
 	}
 
-	bString := string(b[:])
-	bHex := hex.EncodeToString(b)
+	bString := trimString(string(b[:]), bytesWritten)
+	bHex := trimString(hex.EncodeToString(b), bytesWritten * 2)
+	
 	golog.Infof("Write(b []byte): \"%s\" - %d - %s", bString, bytesWritten, bHex)
 
 	return bytesWritten, writeErr
@@ -83,4 +84,12 @@ func (locket LocketConn) SetReadDeadline(t time.Time) error {
 
 func (locket LocketConn) SetWriteDeadline(t time.Time) error {
 	return locket.conn.SetWriteDeadline(t)
+}
+
+func trimString(str string, expectedLength int) string{
+	if len(str) > (expectedLength) {
+		return str[0:expectedLength]
+	} else {
+		return str
+	}
 }

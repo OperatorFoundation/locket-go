@@ -84,3 +84,11 @@ func TestLocket(t *testing.T) {
 		return
 	}
 }
+
+func TestTrim(t *testing.T) {
+	passed := trimString("passed123134jhb4bkj24j2h3jhreiwibr", 6)
+
+	if passed != "passed" {
+		t.Fail()
+	}
+}
