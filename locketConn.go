@@ -1,12 +1,12 @@
 package locketgo
 
 import (
-	"encoding/base64"
+	"encoding/hex"
 	"net"
 	"os"
 	"path"
 	"time"
-	
+
 	"github.com/kataras/golog"
 )
 
@@ -33,8 +33,9 @@ func (locket LocketConn) Read(b []byte) (int, error) {
 		return bytesRead, readErr
 	}
 
-	bString := base64.StdEncoding.EncodeToString(b[:])
-	golog.Infof("Read(b []byte): \"%s\" - %d - %x", bString, bytesRead, b)
+	bString := string(b[:])
+	bHex := hex.EncodeToString(b)
+	golog.Infof("Read(b []byte): \"%s\" - %d - %s", bString, bytesRead, bHex)
 	
 	return bytesRead, readErr
 }
@@ -46,8 +47,9 @@ func (locket LocketConn) Write(b []byte) (int, error) {
 		return bytesWritten, writeErr
 	}
 
-	bString := base64.StdEncoding.EncodeToString(b[:])
-	golog.Infof("Write(b []byte): \"%s\" - %d - %x", bString, bytesWritten, b)
+	bString := string(b[:])
+	bHex := hex.EncodeToString(b)
+	golog.Infof("Write(b []byte): \"%s\" - %d - %s", bString, bytesWritten, bHex)
 
 	return bytesWritten, writeErr
 }
