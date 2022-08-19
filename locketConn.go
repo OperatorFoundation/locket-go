@@ -28,23 +28,39 @@ func NewLocketConn(conn net.Conn, logDir string) (*LocketConn, error) {
 
 func (locket LocketConn) Read(b []byte) (int, error) {
 	bytesRead, readErr := locket.conn.Read(b)
+	if readErr != nil {
+		golog.Errorf("Read(b []byte): Error: %s", readErr)
+		return bytesRead, readErr
+	}
+
 	bString := base64.StdEncoding.EncodeToString(b[:])
-	golog.Infof("Read(b []byte): \"%s\" - %d - %x - ", bString, bytesRead, b)
+	golog.Infof("Read(b []byte): \"%s\" - %d - %x", bString, bytesRead, b)
 	
 	return bytesRead, readErr
 }
 
 func (locket LocketConn) Write(b []byte) (int, error) {
 	bytesWritten, writeErr := locket.conn.Write(b)
+	if writeErr != nil {
+		golog.Errorf("Write(b []byte): Error: %s", writeErr)
+		return bytesWritten, writeErr
+	}
+
 	bString := base64.StdEncoding.EncodeToString(b[:])
-	golog.Infof("Write(b []byte): \"%s\" - %d - %x - ", bString, bytesWritten, b)
+	golog.Infof("Write(b []byte): \"%s\" - %d - %x", bString, bytesWritten, b)
 
 	return bytesWritten, writeErr
 }
 
 func (locket LocketConn) Close() error {
-	golog.Info("Close() called")
-	return locket.conn.Close()
+	closeError := locket.conn.Close()
+	if closeError != nil {
+		golog.Errorf("Close(): Error: %s", closeError)
+	}
+
+	golog.Info("Close() called successfully")
+
+	return closeError
 }
 
 func (locket LocketConn) LocalAddr() net.Addr {
